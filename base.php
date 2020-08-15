@@ -4,7 +4,7 @@ date_default_timezone_set("Asia/Taipei");
 
 class DB
 {
-    private $dsn = "mysql:host=localhost;dbname=db02;charset=utf8";
+    private $dsn = "mysql:host=localhost;dbname=db03;charset=utf8";
     private $root = "root";
     private $password = "";
     public function __construct($table)
@@ -20,6 +20,7 @@ class DB
             $sql .= " WHERE " . implode(" && ", $tmp);
         }
         $sql .= $arg[1] ?? "";
+        // echo $sql;
         return $this->pdo->query($sql)->fetchAll();
     }
     public function count(...$arg)
@@ -59,8 +60,7 @@ class DB
         if (isset($arg['id'])) {
             foreach ($arg as $k => $v) $tmp[] = "`$k`='$v'";
             $sql = sprintf("UPDATE %s SET %s WHERE `id`='%s'", $this->table, implode(",", $tmp), $arg['id']);
-        }
-        $sql = sprintf("INSERT INTO %s (`%s`) VALUES ('%s')", $this->table, implode("`,`", array_keys($arg)), implode("','", $arg));
+        }else $sql = sprintf("INSERT INTO %s (`%s`) VALUES ('%s')", $this->table, implode("`,`", array_keys($arg)), implode("','", $arg));
         return $this->pdo->exec($sql);
     }
 }
@@ -68,3 +68,15 @@ function to($url)
 {
     header("location:$url");
 }
+
+$Ord=new DB('ord');
+$Poster=new DB('poster');
+$Movie=new DB('movie');
+
+if(empty($_SESSION['ani'])) $_SESSION['ani']=1;
+$level=[
+"1"=>"普遍級",
+"2"=>"保護級",
+"3"=>"輔導級",
+"4"=>"限制級",
+];
