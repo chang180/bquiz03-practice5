@@ -37,7 +37,7 @@ class DB
     {
         $sql = "SELECT * FROM $this->table ";
         if (is_array($arg)) {
-            foreach ($arg[0] as $k => $v) $tmp[] = "`$k`='$v'";
+            foreach ($arg as $k => $v) $tmp[] = "`$k`='$v'";
             $sql .= " WHERE " . implode(" && ", $tmp);
         } else $sql .= " WHERE `id`='$arg'";
         return $this->pdo->query($sql)->fetch(PDO::FETCH_ASSOC);
@@ -46,7 +46,7 @@ class DB
     {
         $sql = "DELETE FROM $this->table ";
         if (is_array($arg)) {
-            foreach ($arg[0] as $k => $v) $tmp[] = "`$k`='$v'";
+            foreach ($arg as $k => $v) $tmp[] = "`$k`='$v'";
             $sql .= " WHERE " . implode(" && ", $tmp);
         } else $sql .= " WHERE `id`='$arg'";
         return $this->pdo->exec($sql);
@@ -79,4 +79,11 @@ $level=[
 "2"=>"保護級",
 "3"=>"輔導級",
 "4"=>"限制級",
+];
+$session=[
+"1"=>"14:00~16:00",
+"2"=>"16:00~18:00",
+"3"=>"18:00~20:00",
+"4"=>"20:00~22:00",
+    "5"=>"22:00~24:00",
 ];
