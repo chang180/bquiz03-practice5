@@ -2,6 +2,7 @@
     <h1 class="ct">新增電影</h1>
     片名：<input type="text" name="name"><br>
     排序：<input type="text" name="rank"><br>
+    顯示：<input type="checkbox" name="sh" value="1" checked><br>
     分級：<select name="level">
 <?php
 foreach($level as $key=>$l){

@@ -1,15 +1,16 @@
 <h1 class="ct">訂單管理</h1>
-<form action="api/fast_del.php" method="post" onsubmit="return confirm('確定？')">
-快速刪除： <input type="radio" name="mode" value="1">依日期<input type="text" name="date"><input type="radio" name="mode" value="2">依電影<select name="name">
+<form action="api/fastdel.php" method="post" onsubmit="return confirm('確定？')">
+快速刪除：<input type="radio" name="mode" value="1">依日期<input type="text" name="date"><input type="radio" name="mode" value="2">依電影
+<select name="name" id="name">
 <?php
-$movies=$Movie->all(['sh'=>1]);
-foreach($movies as $m){
-    echo "<option value='".$m['name']."'>".$m['name']."</option>";
+$rows=$Movie->all();
+foreach($rows as $row){
+    echo "<option>".$row['name']."</option>";
 }
 ?>
-</select><button>刪除</button>
+</select>
+<button>刪除</button>
 </form>
-<form>
 <table>
     <tr>
         <td>訂單編號</td>
@@ -21,23 +22,21 @@ foreach($movies as $m){
         <td>操作</td>
     </tr>
     <?php
-$orders=$Ord->all();
-foreach($orders as $o){
+$orders=$Ord->all([]," ORDER BY no DESC");
+foreach($orders as $row){
     ?>
-<tr>
-    <td><?=$o['no'];?></td>
-    <td><?=$o['name'];?></td>
-    <td><?=$o['date'];?></td>
-    <td><?=$o['session'];?></td>
-    <td><?=$o['qt'];?></td>
-    <td><?php
-    $seats=unserialize($o['seat']);
-    foreach($seats as $s) echo $s,",";
-    ?></td>
-    <td>
-        <a href="api/del_ord.php?id=<?=$o['id'];?>">刪除</a>
-    </td>
-</tr>
-<?php } ?>
+    <tr>
+        <td><?=$row['no'];?></td>
+        <td><?=$row['name'];?></td>
+        <td><?=$row['date'];?></td>
+        <td><?=$row['session'];?></td>
+        <td><?=$row['qt'];?></td>
+        <td><?php 
+        foreach(unserialize($row['seat']) as $s) echo $s,",";
+        ?></td>
+        <td>
+            <a href="api/del_order.php?id=<?=$row['id'];?>"><button>刪除</button></a>
+        </td>
+    </tr>
+<?php }?>
 </table>
-</form>

@@ -4,6 +4,7 @@
     <?php $row=$Movie->find($_GET['id']);?>
     片名：<input type="text" name="name" value="<?=$row['name'];?>"><br>
     排序：<input type="text" name="rank" value="<?=$row['rank'];?>"><br>
+    顯示：<input type="checkbox" name="sh" value="1" <?=($row['sh']==1)?"checked":"";?>><br>
     分級：<select name="level">
 <?php
 foreach($level as $key=>$l){
