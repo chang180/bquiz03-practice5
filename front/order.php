@@ -1,51 +1,75 @@
-<h1 class="ct">線上訂票</h1>
-<hr>
-<form id="order-form">
+<form class="order-form">
+    <h1 class="ct">線上訂票</h1>
     電影：<select name="name" id="name">
         <?php
         $today = date("Y-m-d");
-        $ondate = date("Y-m-d", strtotime("$today -2 days "));
-        $movies = $Movie->all(['sh' => 1], " & ondate >= $ondate & ondate <= $today ");
+        $ondate = date("Y-m-d", strtotime("$today - 2 days"));
+        // echo $ondate;
+        $movies = $Movie->all(['sh' => 1], " && date >= '$ondate' && date <= '$today'");
         foreach ($movies as $m) {
-            echo "<option value='" . $m['name'] . "'>" . $m['name'] . "</option>";
+        ?>
+            <option><?= $m['name']; ?></option>
+        <?php
         }
         ?>
     </select><br>
-
     日期：<select name="date" id="date">
-    </select><br>
 
+    </select><br>
     場次：<select name="session" id="session">
-    </select><br>
 
+    </select><br>
     <button type="button" onclick="booking()">確定</button><button type="reset">重置</button>
 </form>
-<form id="seat-form" style="display:none">
-    <div id="seat"></div>
-    <div id="info">
-        您選擇的電影是：<span id="mname"></span><br>
-        您選擇的時刻是：<span id="mdate"></span>&nbsp;<span id="msession"></span><br>
-        您已經勾選了<span id="tick">0</span>張票，最多可以購買4張票<br>
-    </div>
-    <button type="button" onclick="prev()">上一步</button><button type="button" id="send">訂購</button>
-</form>
-
-
+<div class="seat-form" style="display:none;">
+    <div id="seat"></div><br>
+    您選擇的電影是：<span id="mName"></span><br>
+    您選擇的時刻是：<span id="mDate"></span>&nbsp;<span id="mSession"></span><br>
+    您已經勾選了<span id="mTicket">0</span>張票，最多可以購買4張票<br>
+    <button onclick="prev()">回上一步</button><button id="send">完成訂票</button>
+</div>
 <script>
-    let name, date, session, ticket = 0;
+    $.post("api/getseat.php", {}, function(res) {
+
+    })
+
+    $("#name").on("change", function() {
+        getDate();
+        getSession();
+    });
+
+    getDate();
+
+    function getDate() {
+        $.post("api/getdate.php", {
+            "name": $("#name").val()
+        }, function(res) {
+            $("#date").html(res);
+            getSession();
+        })
+    }
+
+    function getSession() {
+        $.post("api/getsession.php", {
+            "name": $("#name").val(),
+            "date": $("#date").val()
+        }, function(res) {
+            $("#session").html(res);
+        })
+    }
 
     function booking() {
-        $("#order-form,#seat-form").toggle();
-        name = $("#name").val(), date = $("#date").val(), session = $("#session").val(), seat = [];
-        $("#mname").text(name);
-        $("#mdate").text(date);
-        $("#msession").text(session);
-        $.post("api/get_seat.php", {
-            name,
-            date,
-            session
+        $.post("api/getseat.php", {
+            "name": $("#name").val(),
+            "date": $("#date").val(),
+            "session": $("#session").val()
         }, function(res) {
+            $("#mName").text($("#name").val());
+            $("#mDate").text($("#date").val());
+            $("#mSession").text($("#session").val());
             $("#seat").html(res);
+            let ticket = 0,
+                seat = [];
             $(".seat").on("change", function() {
                 if (this.checked) {
                     if (ticket > 3) this.checked = false;
@@ -57,43 +81,29 @@
                     ticket--;
                     seat.splice(seat.indexOf(this.value), "1");
                 }
-                $("#tick").text(ticket);
-$("#send").on("click",function(){
-    $.post("api/order.php",{name,date,session,seat},function(no){
-location.href=`?do=result&no=${no}`;
-    })
-})
+                console.log(seat);
+                $("#mTicket").text(ticket);
+            })
+            $("#send").on("click", function() {
+                $.post("api/order.php", {
+                    "name": $("#name").val(),
+                    "date": $("#date").val(),
+                    "session": $("#session").val(),
+                    seat
+                }, function(no) {
+                    // console.log(no);
+                    location.href=`?do=result&no=${no}`;
+
+                })
 
             })
+
         })
+        $(".order-form,.seat-form").toggle();
     }
 
     function prev() {
-        $("#order-form,#seat-form").toggle();
+        $(".order-form,.seat-form").toggle();
         $("#seat").html("");
-    }
-
-    getdate();
-    $("#name").on("change", function() {
-        getdate();
-    })
-
-    function getdate() {
-        $.post("api/get_date.php", {
-            "name": $("#name").val()
-        }, function(res) {
-            $("#date").html(res);
-            getsession();
-        })
-    }
-
-    function getsession() {
-        $.post("api/get_session.php", {
-            "name": $("#name").val(),
-            "date": $("#date").val()
-        }, function(res) {
-            $("#session").html(res);
-        })
-
     }
 </script>

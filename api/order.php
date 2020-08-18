@@ -6,3 +6,4 @@ $mno=$Ord->q("SELECT MAX(id) FROM ord ")[0][0]+1;
 $_POST['no']=date("Ymd").sprintf("%04d",$mno);
 $Ord->save($_POST);
 echo $_POST['no'];
+// print_r($_POST);
